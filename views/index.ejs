@@ -1,0 +1,215 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="container" style="padding-top: 80px; padding-bottom: 80px; text-align: center;">
+  <h1 style="font-size: 44px; font-weight: 800; margin-bottom: 10px; line-height: 1.2;">
+    What's in your<br><span style="color: var(--primary);">kitchen?</span>
+  </h1>
+  <p style="color: var(--muted); font-size: 17px; max-width: 480px; margin: 0 auto 40px;">
+    Type ingredients you have, and AI will suggest recipes you can make right now.
+  </p>
+
+  <div style="max-width: 600px; margin: 0 auto;">
+    <div id="tag-input" style="background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; text-align: left; cursor: pointer; transition: border-color .2s;">
+      <div id="tags" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+      <input id="ingredient-input" type="text" placeholder="Type an ingredient and press Enter..." autofocus style="border: none; outline: none; flex: 1; min-width: 180px; padding: 6px 0; font-size: 15px; font-family: inherit; background: transparent;">
+    </div>
+    <p id="error-msg" style="color: var(--error); font-size: 13px; margin-top: 8px; display: none;">Please add at least one ingredient</p>
+
+    <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: center;">
+      <button id="suggest-btn" disabled style="
+        padding: 14px 40px;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity .2s;
+      ">Find Recipes</button>
+    </div>
+  </div>
+
+  <div id="loading" style="display: none; margin-top: 40px;">
+    <p style="color: var(--primary); font-weight: 600; font-size: 18px;">AI is thinking... <span id="elapsed" style="color: var(--muted); font-size: 15px; font-weight: 500;"></span></p>
+    <p style="color: var(--muted); font-size: 14px;">Finding the best recipes for your ingredients</p>
+  </div>
+
+  <div id="results" style="margin-top: 40px; display: none;">
+    <div id="recipes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;"></div>
+  </div>
+</div>
+
+<script>
+  const tags = [];
+  const tagContainer = document.getElementById('tags');
+  const input = document.getElementById('ingredient-input');
+  const suggestBtn = document.getElementById('suggest-btn');
+  const resultsDiv = document.getElementById('results');
+  const recipesGrid = document.getElementById('recipes-grid');
+  const loading = document.getElementById('loading');
+  const errorMsg = document.getElementById('error-msg');
+  const elapsedSpan = document.getElementById('elapsed');
+
+  function updateBtn() {
+    const has = tags.length > 0 || input.value.trim().length > 0;
+    suggestBtn.disabled = !has;
+    suggestBtn.style.opacity = has ? '1' : '0.5';
+  }
+
+  function commitPending() {
+    const val = input.value.trim().toLowerCase();
+    if (val && !tags.includes(val)) tags.push(val);
+    input.value = '';
+    renderTags();
+  }
+
+  function renderTags() {
+    tagContainer.innerHTML = tags.map((t, i) =>
+      `<span style="background: var(--primary-light); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+        ${t}
+        <span onclick="removeTag(${i})" style="cursor: pointer; font-weight: 800; font-size: 15px;">&times;</span>
+      </span>`
+    ).join('');
+    updateBtn();
+    errorMsg.style.display = 'none';
+  }
+
+  function removeTag(i) {
+    tags.splice(i, 1);
+    renderTags();
+  }
+
+  document.getElementById('tag-input').addEventListener('click', () => input.focus());
+
+  input.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+      e.preventDefault();
+      const val = input.value.trim().toLowerCase();
+      if (!tags.includes(val)) {
+        tags.push(val);
+        renderTags();
+      }
+      input.value = '';
+      updateBtn();
+    }
+  });
+
+  input.addEventListener('blur', commitPending);
+  input.addEventListener('input', updateBtn);
+
+  suggestBtn.addEventListener('click', async () => {
+    if (input.value.trim()) commitPending();
+    if (tags.length === 0) {
+      errorMsg.style.display = 'block';
+      return;
+    }
+    loading.style.display = 'block';
+    resultsDiv.style.display = 'none';
+    errorMsg.style.display = 'none';
+    suggestBtn.disabled = true;
+    const started = Date.now();
+    const timer = setInterval(() => {
+      elapsedSpan.textContent = Math.round((Date.now() - started) / 1000) + 's';
+    }, 1000);
+    try {
+      const res = await fetch('/api/recipes/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ingredients: tags }),
+        signal: AbortSignal.timeout(90000)
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      displayRecipes(data.recipes);
+    } catch (err) {
+      loading.style.display = 'none';
+      errorMsg.textContent = err.name === 'TimeoutError'
+        ? 'AI took too long to respond. Try again or use fewer ingredients.'
+        : (err.message || 'Failed to get recipes. Try again.');
+      errorMsg.style.display = 'block';
+    } finally {
+      clearInterval(timer);
+      elapsedSpan.textContent = '';
+      updateBtn();
+    }
+  });
+
+  function getFoodStyle(title) {
+    const t = title.toLowerCase();
+    if (/pasta|spaghetti|noodle|macaroni/.test(t)) return { emoji: '🍝', gradient: 'linear-gradient(135deg,#7C3AED,#A78BFA)' };
+    if (/rice|risotto|pilaf/.test(t)) return { emoji: '🍚', gradient: 'linear-gradient(135deg,#5B2FE0,#7C3AED)' };
+    if (/soup|stew|broth/.test(t)) return { emoji: '🥣', gradient: 'linear-gradient(135deg,#4F46E5,#818CF8)' };
+    if (/salad|greens|veggie/.test(t)) return { emoji: '🥗', gradient: 'linear-gradient(135deg,#059669,#34D399)' };
+    if (/chicken|turkey|poultry/.test(t)) return { emoji: '🍗', gradient: 'linear-gradient(135deg,#D97706,#F59E0B)' };
+    if (/fish|seafood|shrimp|salmon|tuna/.test(t)) return { emoji: '🐟', gradient: 'linear-gradient(135deg,#2563EB,#60A5FA)' };
+    if (/curry|masala|tikka/.test(t)) return { emoji: '🍛', gradient: 'linear-gradient(135deg,#DB2777,#F472B6)' };
+    if (/bread|toast|sandwich|wrap/.test(t)) return { emoji: '🍞', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
+    if (/cake|dessert|sweet|cookie|pudding/.test(t)) return { emoji: '🍰', gradient: 'linear-gradient(135deg,#BE185D,#F472B6)' };
+    if (/pancake|waffle|breakfast|omelet/.test(t)) return { emoji: '🥞', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
+    if (/smoothie|juice|drink|shake/.test(t)) return { emoji: '🥤', gradient: 'linear-gradient(135deg,#0D9488,#2DD4BF)' };
+    if (/pizza/.test(t)) return { emoji: '🍕', gradient: 'linear-gradient(135deg,#DC2626,#F87171)' };
+    if (/burger|sandwich|hotdog/.test(t)) return { emoji: '🍔', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
+    if (/taco|burrito|quesadilla|nachos/.test(t)) return { emoji: '🌮', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
+    if (/egg|tofu|beans/.test(t)) return { emoji: '🥚', gradient: 'linear-gradient(135deg,#6B7280,#9CA3AF)' };
+    return { emoji: '🍽️', gradient: 'linear-gradient(135deg,#7C3AED,#4F46E5)' };
+  }
+
+  function displayRecipes(recipes) {
+    loading.style.display = 'none';
+    recipesGrid.innerHTML = recipes.map((r, i) => {
+      const isLoggedIn = <%= user ? 'true' : 'false' %>;
+      const fs = getFoodStyle(r.title);
+      return `
+        <div style="background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; text-align: left;">
+          <div style="background: ${fs.gradient}; padding: 24px; text-align: center;">
+            <span style="font-size: 42px;">${fs.emoji}</span>
+          </div>
+          <div style="padding: 20px;">
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 14px; color: var(--text);">${r.title}</h3>
+          <div style="margin-bottom: 14px;">
+            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              ${r.ingredients.map(ing => `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${ing}</span>`).join('')}
+            </div>
+          </div>
+          <div>
+            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
+            <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.7;">
+              ${r.steps.map(s => `<li style="margin-bottom: 4px;">${s}</li>`).join('')}
+            </ol>
+          </div>
+          ${isLoggedIn ? `<button onclick="saveRecipe(${i}, '${r.title.replace(/'/g, "\\'")}')" style="margin-top: 18px; padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;">Save Recipe</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    resultsDiv.style.display = 'block';
+
+    <% if (user) { %>
+      window.recipeData = recipes;
+    <% } %>
+  }
+
+  <% if (user) { %>
+  async function saveRecipe(idx, title) {
+    const r = window.recipeData[idx];
+    try {
+      const res = await fetch('/api/recipes/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: r.title, ingredients: r.ingredients, steps: r.steps })
+      });
+      const data = await res.json();
+      if (data.saved) alert('Recipe saved!');
+    } catch (err) {
+      alert('Failed to save recipe');
+    }
+  }
+  <% } %>
+</script>
+
+</body>
+</html>

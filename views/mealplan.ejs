@@ -1,0 +1,77 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="container" style="padding-top: 60px; padding-bottom: 80px;">
+  <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">Weekly Meal Plan</h1>
+  <p style="color: var(--muted); font-size: 15px; margin-bottom: 32px;">Let AI plan your meals for the week</p>
+
+  <div style="max-width: 500px; margin-bottom: 40px; background: var(--surface); padding: 24px; border-radius: var(--radius); box-shadow: var(--shadow);">
+    <div style="margin-bottom: 16px;">
+      <label style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 6px;">Diet Preference</label>
+      <select id="diet" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: #F0F0F8; outline: none;">
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+        <option value="non-vegetarian">Non-Vegetarian</option>
+        <option value="any">Any</option>
+      </select>
+    </div>
+    <div style="margin-bottom: 20px;">
+      <label style="font-size: 14px; font-weight: 600; display: block; margin-bottom: 6px;">Number of Days</label>
+      <select id="days" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: #F0F0F8; outline: none;">
+        <option value="3">3 Days</option>
+        <option value="5">5 Days</option>
+        <option value="7" selected>7 Days (Full Week)</option>
+      </select>
+    </div>
+    <button onclick="generatePlan()" style="width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer;">Generate Plan</button>
+  </div>
+
+  <div id="loading" style="display: none; text-align: center; padding: 40px 0;">
+    <p style="color: var(--primary); font-weight: 600; font-size: 18px;">AI is planning your meals... <span id="elapsed" style="color: var(--muted); font-size: 15px; font-weight: 500;"></span></p>
+  </div>
+
+  <div id="plan" style="display: none;">
+    <div id="plan-grid" style="display: grid; gap: 24px;"></div>
+  </div>
+</div>
+
+<script>
+  async function generatePlan() {
+    const diet = document.getElementById('diet').value;
+    const days = parseInt(document.getElementById('days').value);
+    const grid = document.getElementById('plan-grid');
+    const loadingEl = document.getElementById('loading');
+    const planEl = document.getElementById('plan');
+    const elapsedSpan = document.getElementById('elapsed');
+    loadingEl.style.display = 'block';
+    planEl.style.display = 'none';
+    const started = Date.now();
+    const timer = setInterval(() => {
+      elapsedSpan.textContent = Math.round((Date.now() - started) / 1000) + 's';
+    }, 1000);
+    try {
+      const res = await fetch('/api/mealplan/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diet, days }),
+        signal: AbortSignal.timeout(90000)
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      grid.innerHTML = data.html;
+      loadingEl.style.display = 'none';
+      planEl.style.display = 'block';
+    } catch (err) {
+      loadingEl.style.display = 'none';
+      alert(err.name === 'TimeoutError'
+        ? 'AI took too long to respond. Try a shorter plan (3 days) or again later.'
+        : (err.message || 'Failed to generate plan'));
+    } finally {
+      clearInterval(timer);
+      elapsedSpan.textContent = '';
+    }
+  }
+</script>
+
+</body>
+</html>

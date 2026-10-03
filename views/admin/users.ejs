@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+<%- include('../partials/adminNavbar') %>
+
+<style>
+  .admin-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .admin-table th { text-align: left; padding: 14px 18px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); background: var(--bg); border-bottom: 1px solid var(--border); }
+  .admin-table td { padding: 14px 18px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .btn-sm { padding: 6px 14px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-danger { background: var(--error); color: #fff; }
+  .btn-danger:hover { opacity: 0.85; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+  .badge-admin { background: var(--primary-light); color: var(--primary-dark); }
+  .badge-user { background: #F3F4F6; color: #6B7280; }
+</style>
+
+<div class="container" style="padding-top: 60px; padding-bottom: 80px;">
+  <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 4px;">Users</h1>
+  <p style="color: var(--muted); font-size: 15px; margin-bottom: 24px;"><%= users.length %> user(s)</p>
+
+  <% if (users.length === 0) { %>
+    <div style="text-align: center; padding: 60px 0; color: var(--muted); font-weight: 600;">No users yet.</div>
+  <% } else { %>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td style="font-weight: 600;"><%= u.name %></td>
+            <td><%= u.email %></td>
+            <td><span class="badge <%= u.role === 'admin' ? 'badge-admin' : 'badge-user' %>"><%= u.role %></span></td>
+            <td style="color: var(--muted); font-size: 13px;"><%= u.createdAt.toLocaleDateString() %></td>
+            <td>
+              <% if (u.role !== 'admin') { %>
+                <form method="POST" action="/admin/users/<%= u._id %>/delete" onsubmit="return confirm('Delete user <%= u.name %> and all their saved recipes?')" style="display:inline;">
+                  <button type="submit" class="btn-sm btn-danger">&times; Delete</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <div style="margin-top: 24px;">
+    <a href="/admin" style="color: var(--primary); font-weight: 600; font-size: 14px;">&larr; Back to Dashboard</a>
+  </div>
+</div>
+
+</body>
+</html>

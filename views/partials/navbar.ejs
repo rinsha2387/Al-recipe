@@ -1,0 +1,85 @@
+<style>
+  .navbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(124,58,237,.08);
+  }
+  .navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .navbar-brand {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .nav-link {
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+  .nav-btn {
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .nav-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124,58,237,.3);
+  }
+  .nav-logout {
+    color: var(--error);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all .2s ease;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .nav-logout:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+</style>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="/" class="navbar-brand">CookingAI</a>
+    <div class="navbar-links">
+      <a href="/" class="nav-link<%= activePage === 'home' ? ' active' : '' %>">Home</a>
+      <% if (user) { %>
+        <a href="/saved" class="nav-link<%= activePage === 'saved' ? ' active' : '' %>">Saved</a>
+        <a href="/mealplan" class="nav-link<%= activePage === 'mealplan' ? ' active' : '' %>">Meal Plan</a>
+        <a href="/auth/logout" class="nav-logout">Logout</a>
+      <% } else { %>
+        <a href="/login" class="nav-link<%= activePage === 'login' ? ' active' : '' %>">Login</a>
+        <a href="/signup" class="nav-btn">Sign Up</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

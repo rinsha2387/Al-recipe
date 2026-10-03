@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="container" style="padding-top: 60px; padding-bottom: 80px;">
+  <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 32px;">Saved Recipes</h1>
+
+  <% if (recipes.length === 0) { %>
+    <div style="text-align: center; padding: 80px 0; color: var(--muted);">
+      <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No saved recipes yet</p>
+      <p style="font-size: 14px;">Go find some recipes to save!</p>
+    </div>
+  <% } else { %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+      <% recipes.forEach(r => { %>
+        <div style="background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+            <h3 style="font-size: 20px; font-weight: 700;"><%= r.title %></h3>
+            <button onclick="unsave('<%= r._id %>')" style="background: none; border: none; cursor: pointer; color: var(--error); font-size: 18px; font-weight: 700;">&times;</button>
+          </div>
+          <div style="margin-bottom: 14px;">
+            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <% r.ingredients.forEach(ing => { %>
+                <span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;"><%= ing %></span>
+              <% }) %>
+            </div>
+          </div>
+          <div>
+            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
+            <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.7;">
+              <% r.steps.forEach(s => { %>
+                <li style="margin-bottom: 4px;"><%= s %></li>
+              <% }) %>
+            </ol>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  async function unsave(id) {
+    if (!confirm('Remove this recipe?')) return;
+    try {
+      await fetch('/api/recipes/save/' + id, { method: 'DELETE' });
+      location.reload();
+    } catch { alert('Failed to remove'); }
+  }
+</script>
+
+</body>
+</html>

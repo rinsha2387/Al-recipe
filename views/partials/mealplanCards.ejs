@@ -1,0 +1,50 @@
+<% function getFoodStyle(title) {
+  const t = (title || '').toLowerCase();
+  if (/pasta|spaghetti|noodle|macaroni/.test(t)) return { emoji: '🍝', gradient: 'linear-gradient(135deg,#7C3AED,#A78BFA)' };
+  if (/rice|risotto|pilaf/.test(t)) return { emoji: '🍚', gradient: 'linear-gradient(135deg,#5B2FE0,#7C3AED)' };
+  if (/soup|stew|broth/.test(t)) return { emoji: '🥣', gradient: 'linear-gradient(135deg,#4F46E5,#818CF8)' };
+  if (/salad|greens|veggie/.test(t)) return { emoji: '🥗', gradient: 'linear-gradient(135deg,#059669,#34D399)' };
+  if (/chicken|turkey|poultry/.test(t)) return { emoji: '🍗', gradient: 'linear-gradient(135deg,#D97706,#F59E0B)' };
+  if (/fish|seafood|shrimp|salmon|tuna/.test(t)) return { emoji: '🐟', gradient: 'linear-gradient(135deg,#2563EB,#60A5FA)' };
+  if (/curry|masala|tikka/.test(t)) return { emoji: '🍛', gradient: 'linear-gradient(135deg,#DB2777,#F472B6)' };
+  if (/bread|toast|sandwich|wrap/.test(t)) return { emoji: '🍞', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
+  if (/cake|dessert|sweet|cookie|pudding/.test(t)) return { emoji: '🍰', gradient: 'linear-gradient(135deg,#BE185D,#F472B6)' };
+  if (/pancake|waffle|breakfast|omelet/.test(t)) return { emoji: '🥞', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
+  if (/smoothie|juice|drink|shake/.test(t)) return { emoji: '🥤', gradient: 'linear-gradient(135deg,#0D9488,#2DD4BF)' };
+  if (/pizza/.test(t)) return { emoji: '🍕', gradient: 'linear-gradient(135deg,#DC2626,#F87171)' };
+  if (/burger|sandwich|hotdog/.test(t)) return { emoji: '🍔', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
+  if (/taco|burrito|quesadilla|nachos/.test(t)) return { emoji: '🌮', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
+  if (/egg|tofu|beans/.test(t)) return { emoji: '🥚', gradient: 'linear-gradient(135deg,#6B7280,#9CA3AF)' };
+  return { emoji: '🍽️', gradient: 'linear-gradient(135deg,#7C3AED,#4F46E5)' };
+} %><% plan.forEach(function(day) { %>
+  <div style="background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);">
+    <h2 style="font-size: 22px; font-weight: 800; color: var(--primary); padding: 20px 24px 0; margin-bottom: 8px;"><%- day.day %></h2>
+    <div style="padding: 0 24px 24px;">
+    <% (day.meals || []).forEach(function(m) { var fs = getFoodStyle(m.dish); %>
+      <div style="margin-bottom: 16px; background: var(--bg); border-radius: var(--radius-sm); overflow: hidden;">
+        <div style="background: <%- fs.gradient %>; padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;"><%- fs.emoji %></span>
+          <div>
+            <p style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 0.5px;"><%- m.meal %></p>
+            <p style="font-size: 16px; font-weight: 700; color: #fff;"><%- m.dish %></p>
+          </div>
+        </div>
+        <div style="padding: 16px;">
+          <p style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px;">Ingredients:</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+            <% (m.ingredients || []).forEach(function(ing) { %>
+              <span style="background: var(--primary-light); color: var(--primary-dark); padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600;"><%- ing %></span>
+            <% }) %>
+          </div>
+          <p style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px;">Steps:</p>
+          <ol style="padding-left: 16px; font-size: 13px; color: #374151; line-height: 1.6;">
+            <% (m.steps || []).forEach(function(s) { %>
+              <li style="margin-bottom: 3px;"><%- s %></li>
+            <% }) %>
+          </ol>
+        </div>
+      </div>
+    <% }) %>
+    </div>
+  </div>
+<% }) %>

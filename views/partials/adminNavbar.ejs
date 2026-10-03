@@ -1,0 +1,65 @@
+<style>
+  .admin-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(124,58,237,.08);
+  }
+  .admin-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .admin-nav-brand {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .admin-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .admin-nav-links a {
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .admin-nav-links a:hover,
+  .admin-nav-links a.active {
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+  .admin-back {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .admin-back:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+</style>
+
+<nav class="admin-nav">
+  <div class="container admin-nav-inner">
+    <a href="/admin" class="admin-nav-brand">CookingAI Admin</a>
+    <div class="admin-nav-links">
+      <a href="/admin" class="<%= activeAdmin === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/admin/users" class="<%= activeAdmin === 'users' ? 'active' : '' %>">Users</a>
+      <a href="/admin/recipes" class="<%= activeAdmin === 'recipes' ? 'active' : '' %>">Recipes</a>
+    </div>
+    <a href="/" class="admin-back">&larr; Back to App</a>
+  </div>
+</nav>
