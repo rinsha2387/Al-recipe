@@ -2,50 +2,210 @@
 <%- include('partials/navbar') %>
 
 <div class="container" style="padding-top: 60px; padding-bottom: 80px;">
-  <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 32px;">Saved Recipes</h1>
-
-  <% if (recipes.length === 0) { %>
-    <div style="text-align: center; padding: 80px 0; color: var(--muted);">
-      <p style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No saved recipes yet</p>
-      <p style="font-size: 14px;">Go find some recipes to save!</p>
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 28px;">
+    <div>
+      <h1 style="font-size: 34px; font-weight: 800; margin-bottom: 6px;">Saved Collection</h1>
+      <p style="color: var(--muted); font-size: 16px;">All your favorite recipes and weekly meal plans in one place</p>
     </div>
-  <% } else { %>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
-      <% recipes.forEach(r => { %>
-        <div style="background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
-            <h3 style="font-size: 20px; font-weight: 700;"><%= r.title %></h3>
-            <button onclick="unsave('<%= r._id %>')" style="background: none; border: none; cursor: pointer; color: var(--error); font-size: 18px; font-weight: 700;">&times;</button>
-          </div>
-          <div style="margin-bottom: 14px;">
-            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <% r.ingredients.forEach(ing => { %>
-                <span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;"><%= ing %></span>
-              <% }) %>
+
+    <!-- Collection Tabs -->
+    <div style="display: flex; gap: 8px; background: var(--border); padding: 4px; border-radius: 12px;">
+      <button id="tab-recipes-btn" onclick="switchCollectionTab('recipes')" style="padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: var(--primary); color: #fff; transition: all .2s;">
+        Recipes (<%= recipes.length %>)
+      </button>
+      <button id="tab-mealplans-btn" onclick="switchCollectionTab('mealplans')" style="padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); transition: all .2s;">
+        Meal Plans (<%= typeof mealPlans !== 'undefined' ? mealPlans.length : 0 %>)
+      </button>
+    </div>
+  </div>
+
+  <!-- SECTION 1: SAVED RECIPES -->
+  <div id="section-recipes">
+    <% if (recipes.length === 0) { %>
+      <div style="text-align: center; padding: 70px 20px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);">
+        <div style="font-size: 48px; margin-bottom: 12px;">🍽️</div>
+        <p style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">No saved recipes yet</p>
+        <p style="color: var(--muted); font-size: 15px; margin-bottom: 24px;">Find delicious recipes with ingredients you have and save them!</p>
+        <a href="/" style="display: inline-block; padding: 12px 28px; background: var(--primary); color: #fff; border-radius: 8px; font-weight: 700; font-size: 14px;">Find Recipes</a>
+      </div>
+    <% } else { %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+        <% recipes.forEach(r => { %>
+          <div style="background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column;">
+            <% if (r.image) { %>
+              <div style="position: relative; width: 100%; height: 200px; background: #eee; overflow: hidden;">
+                <img src="<%= r.image %>" alt="<%= r.title %>" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.parentElement.style.display='none'">
+              </div>
+            <% } %>
+            <div style="padding: 24px; flex: 1; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px;">
+                <h3 style="font-size: 20px; font-weight: 700; line-height: 1.3;"><%= r.title %></h3>
+                <button onclick="unsave('<%= r._id %>')" title="Remove recipe" style="background: none; border: none; cursor: pointer; color: var(--error); font-size: 22px; font-weight: 700; line-height: 1; padding: 0 4px;">&times;</button>
+              </div>
+              <div style="margin-bottom: 14px;">
+                <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <% (r.ingredients || []).forEach(ing => { %>
+                    <span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;"><%= ing %></span>
+                  <% }) %>
+                </div>
+              </div>
+              <div>
+                <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
+                <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.7;">
+                  <% (r.steps || []).forEach(s => { %>
+                    <li style="margin-bottom: 4px;"><%= s %></li>
+                  <% }) %>
+                </ol>
+              </div>
             </div>
           </div>
-          <div>
-            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
-            <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.7;">
-              <% r.steps.forEach(s => { %>
-                <li style="margin-bottom: 4px;"><%= s %></li>
-              <% }) %>
-            </ol>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- SECTION 2: SAVED MEAL PLANS -->
+  <div id="section-mealplans" style="display: none;">
+    <% if (typeof mealPlans === 'undefined' || mealPlans.length === 0) { %>
+      <div style="text-align: center; padding: 70px 20px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);">
+        <div style="font-size: 48px; margin-bottom: 12px;">📅</div>
+        <p style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">No saved meal plans yet</p>
+        <p style="color: var(--muted); font-size: 15px; margin-bottom: 24px;">Create a weekly meal plan and save it to access it anytime!</p>
+        <a href="/mealplan" style="display: inline-block; padding: 12px 28px; background: var(--primary); color: #fff; border-radius: 8px; font-weight: 700; font-size: 14px;">Plan Meals</a>
+      </div>
+    <% } else { %>
+      <div style="display: grid; gap: 24px;">
+        <% mealPlans.forEach(sp => { %>
+          <div id="saved-plan-card-<%- sp._id %>" style="background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);">
+            <div style="padding: 22px 26px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <h3 style="font-size: 20px; font-weight: 800;"><%- sp.title %></h3>
+                  <span style="background: var(--primary-light); color: var(--primary); padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                    <%- sp.diet %>
+                  </span>
+                  <span style="background: #E0E7FF; color: #4338CA; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                    <%- sp.days %> Days
+                  </span>
+                </div>
+                <p style="color: var(--muted); font-size: 13px;">
+                  Saved on <%= new Date(sp.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="toggleSavedPlan('<%- sp._id %>')" id="toggle-sp-<%- sp._id %>" style="padding: 8px 16px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                  View Details ▼
+                </button>
+                <button onclick="unsaveMealPlan('<%- sp._id %>')" title="Delete plan" style="padding: 8px 14px; background: #FEE2E2; color: #DC2626; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <!-- Detailed Day Breakdown -->
+            <div id="sp-details-<%- sp._id %>" style="display: none; padding: 24px; background: #FAFAFD;">
+              <div style="display: grid; gap: 18px;">
+                <% (sp.plan || []).forEach(day => { %>
+                  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px 22px;">
+                    <h4 style="font-size: 17px; font-weight: 800; color: var(--primary); margin-bottom: 12px;"><%- day.day %></h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                      <% (day.meals || []).forEach(m => { %>
+                        <div style="background: var(--bg); padding: 12px 16px; border-radius: 8px;">
+                          <p style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;"><%- m.meal %></p>
+                          <p style="font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px;"><%- m.dish %></p>
+                          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
+                            <% (m.ingredients || []).forEach(ing => { %>
+                              <span style="background: var(--primary-light); color: var(--primary-dark); font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600;"><%- ing %></span>
+                            <% }) %>
+                          </div>
+                          <ol style="padding-left: 16px; font-size: 12px; color: #4B5563; line-height: 1.5;">
+                            <% (m.steps || []).forEach(s => { %>
+                              <li><%- s %></li>
+                            <% }) %>
+                          </ol>
+                        </div>
+                      <% }) %>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
           </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } %>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
 </div>
 
 <script>
+  function switchCollectionTab(tab) {
+    const secRecipes = document.getElementById('section-recipes');
+    const secMealPlans = document.getElementById('section-mealplans');
+    const btnRecipes = document.getElementById('tab-recipes-btn');
+    const btnMealPlans = document.getElementById('tab-mealplans-btn');
+
+    if (tab === 'recipes') {
+      secRecipes.style.display = 'block';
+      secMealPlans.style.display = 'none';
+      btnRecipes.style.background = 'var(--primary)';
+      btnRecipes.style.color = '#fff';
+      btnMealPlans.style.background = 'transparent';
+      btnMealPlans.style.color = 'var(--muted)';
+    } else {
+      secRecipes.style.display = 'none';
+      secMealPlans.style.display = 'block';
+      btnMealPlans.style.background = 'var(--primary)';
+      btnMealPlans.style.color = '#fff';
+      btnRecipes.style.background = 'transparent';
+      btnRecipes.style.color = 'var(--muted)';
+    }
+  }
+
+  function toggleSavedPlan(id) {
+    const details = document.getElementById('sp-details-' + id);
+    const btn = document.getElementById('toggle-sp-' + id);
+    if (details.style.display === 'none' || !details.style.display) {
+      details.style.display = 'block';
+      btn.textContent = 'Hide Details ▲';
+    } else {
+      details.style.display = 'none';
+      btn.textContent = 'View Details ▼';
+    }
+  }
+
   async function unsave(id) {
-    if (!confirm('Remove this recipe?')) return;
+    if (!confirm('Remove this recipe from saved?')) return;
     try {
       await fetch('/api/recipes/save/' + id, { method: 'DELETE' });
       location.reload();
     } catch { alert('Failed to remove'); }
+  }
+
+  async function unsaveMealPlan(id) {
+    if (!confirm('Remove this meal plan from saved?')) return;
+    try {
+      const res = await fetch('/api/mealplan/save/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.deleted) {
+        const card = document.getElementById('saved-plan-card-' + id);
+        if (card) {
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          card.style.transition = 'all .3s ease';
+          setTimeout(() => location.reload(), 300);
+        }
+      }
+    } catch {
+      alert('Failed to remove meal plan');
+    }
+  }
+
+  // Check URL query param for default tab (e.g. /saved?tab=mealplans)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'mealplans') {
+    switchCollectionTab('mealplans');
   }
 </script>
 

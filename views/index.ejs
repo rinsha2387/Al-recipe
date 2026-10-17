@@ -138,23 +138,40 @@
   });
 
   function getFoodStyle(title) {
-    const t = title.toLowerCase();
-    if (/pasta|spaghetti|noodle|macaroni/.test(t)) return { emoji: '🍝', gradient: 'linear-gradient(135deg,#7C3AED,#A78BFA)' };
-    if (/rice|risotto|pilaf/.test(t)) return { emoji: '🍚', gradient: 'linear-gradient(135deg,#5B2FE0,#7C3AED)' };
-    if (/soup|stew|broth/.test(t)) return { emoji: '🥣', gradient: 'linear-gradient(135deg,#4F46E5,#818CF8)' };
-    if (/salad|greens|veggie/.test(t)) return { emoji: '🥗', gradient: 'linear-gradient(135deg,#059669,#34D399)' };
-    if (/chicken|turkey|poultry/.test(t)) return { emoji: '🍗', gradient: 'linear-gradient(135deg,#D97706,#F59E0B)' };
-    if (/fish|seafood|shrimp|salmon|tuna/.test(t)) return { emoji: '🐟', gradient: 'linear-gradient(135deg,#2563EB,#60A5FA)' };
-    if (/curry|masala|tikka/.test(t)) return { emoji: '🍛', gradient: 'linear-gradient(135deg,#DB2777,#F472B6)' };
-    if (/bread|toast|sandwich|wrap/.test(t)) return { emoji: '🍞', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
-    if (/cake|dessert|sweet|cookie|pudding/.test(t)) return { emoji: '🍰', gradient: 'linear-gradient(135deg,#BE185D,#F472B6)' };
-    if (/pancake|waffle|breakfast|omelet/.test(t)) return { emoji: '🥞', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
-    if (/smoothie|juice|drink|shake/.test(t)) return { emoji: '🥤', gradient: 'linear-gradient(135deg,#0D9488,#2DD4BF)' };
-    if (/pizza/.test(t)) return { emoji: '🍕', gradient: 'linear-gradient(135deg,#DC2626,#F87171)' };
-    if (/burger|sandwich|hotdog/.test(t)) return { emoji: '🍔', gradient: 'linear-gradient(135deg,#92400E,#D97706)' };
-    if (/taco|burrito|quesadilla|nachos/.test(t)) return { emoji: '🌮', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)' };
-    if (/egg|tofu|beans/.test(t)) return { emoji: '🥚', gradient: 'linear-gradient(135deg,#6B7280,#9CA3AF)' };
-    return { emoji: '🍽️', gradient: 'linear-gradient(135deg,#7C3AED,#4F46E5)' };
+    const t = (title || '').toLowerCase();
+    if (/pasta|spaghetti|noodle|macaroni|lasagna|penne|fettuccine|linguine/.test(t))
+      return { emoji: '🍝', gradient: 'linear-gradient(135deg,#7C3AED,#A78BFA)', fallbackUrl: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80' };
+    if (/rice|risotto|pilaf|biryani|fried rice/.test(t))
+      return { emoji: '🍚', gradient: 'linear-gradient(135deg,#5B2FE0,#7C3AED)', fallbackUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80' };
+    if (/soup|stew|broth|chowder|ramen/.test(t))
+      return { emoji: '🥣', gradient: 'linear-gradient(135deg,#4F46E5,#818CF8)', fallbackUrl: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80' };
+    if (/salad|greens|veggie|slaw/.test(t))
+      return { emoji: '🥗', gradient: 'linear-gradient(135deg,#059669,#34D399)', fallbackUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80' };
+    if (/chicken|turkey|poultry|wings/.test(t))
+      return { emoji: '🍗', gradient: 'linear-gradient(135deg,#D97706,#F59E0B)', fallbackUrl: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=800&q=80' };
+    if (/fish|seafood|shrimp|salmon|tuna|prawn|crab/.test(t))
+      return { emoji: '🐟', gradient: 'linear-gradient(135deg,#2563EB,#60A5FA)', fallbackUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80' };
+    if (/curry|masala|tikka|dal|korma|paneer/.test(t))
+      return { emoji: '🍛', gradient: 'linear-gradient(135deg,#DB2777,#F472B6)', fallbackUrl: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=800&q=80' };
+    if (/bread|toast|sandwich|wrap|panini/.test(t))
+      return { emoji: '🥪', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)', fallbackUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80' };
+    if (/cake|dessert|sweet|cookie|pudding|pie|chocolate|brownie/.test(t))
+      return { emoji: '🍰', gradient: 'linear-gradient(135deg,#BE185D,#F472B6)', fallbackUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&w=800&q=80' };
+    if (/pancake|waffle|crepe|french toast/.test(t))
+      return { emoji: '🥞', gradient: 'linear-gradient(135deg,#92400E,#D97706)', fallbackUrl: 'https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=800&q=80' };
+    if (/smoothie|juice|drink|shake/.test(t))
+      return { emoji: '🥤', gradient: 'linear-gradient(135deg,#0D9488,#2DD4BF)', fallbackUrl: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=800&q=80' };
+    if (/pizza/.test(t))
+      return { emoji: '🍕', gradient: 'linear-gradient(135deg,#DC2626,#F87171)', fallbackUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80' };
+    if (/burger|hamburger|hotdog/.test(t))
+      return { emoji: '🍔', gradient: 'linear-gradient(135deg,#92400E,#D97706)', fallbackUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80' };
+    if (/taco|burrito|quesadilla|nachos|fajita/.test(t))
+      return { emoji: '🌮', gradient: 'linear-gradient(135deg,#B45309,#F59E0B)', fallbackUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=800&q=80' };
+    if (/egg|tofu|beans|omelet|omelette|frittata/.test(t))
+      return { emoji: '🍳', gradient: 'linear-gradient(135deg,#6B7280,#9CA3AF)', fallbackUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80' };
+    if (/beef|steak|pork|meat|lamb/.test(t))
+      return { emoji: '🥩', gradient: 'linear-gradient(135deg,#991B1B,#EF4444)', fallbackUrl: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=800&q=80' };
+    return { emoji: '🍽️', gradient: 'linear-gradient(135deg,#7C3AED,#4F46E5)', fallbackUrl: 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80' };
   }
 
   function displayRecipes(recipes) {
@@ -162,26 +179,36 @@
     recipesGrid.innerHTML = recipes.map((r, i) => {
       const isLoggedIn = <%= user ? 'true' : 'false' %>;
       const fs = getFoodStyle(r.title);
+      const photoUrl = r.image || r.imageUrl || fs.fallbackUrl;
       return `
-        <div style="background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; text-align: left;">
-          <div style="background: ${fs.gradient}; padding: 24px; text-align: center;">
-            <span style="font-size: 42px;">${fs.emoji}</span>
-          </div>
-          <div style="padding: 20px;">
-          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 14px; color: var(--text);">${r.title}</h3>
-          <div style="margin-bottom: 14px;">
-            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              ${r.ingredients.map(ing => `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${ing}</span>`).join('')}
+        <div class="recipe-card" style="background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; text-align: left; display: flex; flex-direction: column;">
+          <div style="position: relative; width: 100%; height: 220px; background: ${fs.gradient}; overflow: hidden;">
+            <img src="${photoUrl}"
+                 alt="${r.title.replace(/"/g, '&quot;')}"
+                 loading="lazy"
+                 onerror="this.onerror=null; this.src='${fs.fallbackUrl}';"
+                 style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease;"
+                 onmouseover="this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.transform='scale(1)'">
+            <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); padding: 5px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+              <span>${fs.emoji}</span>
             </div>
           </div>
-          <div>
-            <p style="font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
-            <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.7;">
-              ${r.steps.map(s => `<li style="margin-bottom: 4px;">${s}</li>`).join('')}
-            </ol>
-          </div>
-          ${isLoggedIn ? `<button onclick="saveRecipe(${i}, '${r.title.replace(/'/g, "\\'")}')" style="margin-top: 18px; padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;">Save Recipe</button>` : ''}
+          <div style="padding: 22px; display: flex; flex-direction: column; flex: 1;">
+            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 14px; color: var(--text); line-height: 1.3;">${r.title}</h3>
+            <div style="margin-bottom: 14px;">
+              <p style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Ingredients</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${(r.ingredients || []).map(ing => `<span style="background: var(--primary-light); color: var(--primary-dark); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${ing}</span>`).join('')}
+              </div>
+            </div>
+            <div style="margin-bottom: 16px; flex: 1;">
+              <p style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Steps</p>
+              <ol style="padding-left: 18px; font-size: 14px; color: #374151; line-height: 1.6;">
+                ${(r.steps || []).map(s => `<li style="margin-bottom: 4px;">${s}</li>`).join('')}
+              </ol>
+            </div>
+            ${isLoggedIn ? `<button onclick="saveRecipe(${i}, '${r.title.replace(/'/g, "\\'")}')" style="margin-top: auto; padding: 12px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; transition: background .2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">💾 Save Recipe</button>` : ''}
           </div>
         </div>
       `;
@@ -200,7 +227,12 @@
       const res = await fetch('/api/recipes/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: r.title, ingredients: r.ingredients, steps: r.steps })
+        body: JSON.stringify({
+          title: r.title,
+          ingredients: r.ingredients,
+          steps: r.steps,
+          image: r.image || r.imageUrl || ''
+        })
       });
       const data = await res.json();
       if (data.saved) alert('Recipe saved!');

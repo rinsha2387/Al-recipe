@@ -1,14 +1,17 @@
 const User = require('../models/User');
 const Recipe = require('../models/Recipe');
+const MealPlan = require('../models/MealPlan');
 
 exports.getDashboard = async (req, res) => {
   const totalUsers = await User.countDocuments();
   const totalRecipes = await Recipe.countDocuments();
+  const totalMealPlans = await MealPlan.countDocuments();
   res.render('admin/dashboard', {
     user: req.user,
     activeAdmin: 'dashboard',
     totalUsers,
     totalRecipes,
+    totalMealPlans,
   });
 };
 
@@ -19,6 +22,7 @@ exports.getUsers = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   await Recipe.deleteMany({ savedBy: req.params.id });
+  await MealPlan.deleteMany({ savedBy: req.params.id });
   await User.findByIdAndDelete(req.params.id);
   res.redirect('/admin/users');
 };

@@ -1,12 +1,15 @@
 const gemini = require('../services/gemini');
+const imageService = require('../services/imageService');
 const Recipe = require('../models/Recipe');
+const MealPlan = require('../models/MealPlan');
 
 exports.suggest = async (req, res) => {
   try {
     const { ingredients } = req.body;
     if (!ingredients || !ingredients.length)
       return res.status(400).json({ error: 'Please provide at least one ingredient' });
-    const recipes = await gemini.suggestRecipes(ingredients);
+    const rawRecipes = await gemini.suggestRecipes(ingredients);
+    const recipes = await imageService.attachRecipeImages(rawRecipes);
     res.json({ recipes });
   } catch (err) {
     console.error('Gemini API error:', err.message);
@@ -18,10 +21,16 @@ exports.suggest = async (req, res) => {
 
 exports.saveRecipe = async (req, res) => {
   try {
-    const { title, ingredients, steps } = req.body;
+    const { title, ingredients, steps, image, imageUrl } = req.body;
     let recipe = await Recipe.findOne({ title, savedBy: req.user._id });
     if (recipe) return res.json({ saved: true });
-    recipe = await Recipe.create({ title, ingredients, steps, savedBy: req.user._id });
+    recipe = await Recipe.create({
+      title,
+      ingredients,
+      steps,
+      image: image || imageUrl || '',
+      savedBy: req.user._id
+    });
     res.json({ saved: true, recipe });
   } catch (err) {
     console.error(err);
@@ -31,8 +40,9 @@ exports.saveRecipe = async (req, res) => {
 
 exports.getSaved = async (req, res) => {
   try {
-    const recipes = await Recipe.find({ savedBy: req.user._id }).lean();
-    res.render('saved', { user: req.user, recipes, activePage: 'saved' });
+    const recipes = await Recipe.find({ savedBy: req.user._id }).sort('-createdAt').lean();
+    const mealPlans = await MealPlan.find({ savedBy: req.user._id }).sort('-createdAt').lean();
+    res.render('saved', { user: req.user, recipes, mealPlans, activePage: 'saved' });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');

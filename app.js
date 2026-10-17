@@ -42,8 +42,18 @@ app.get('/signup', (req, res) => {
   res.render('signup', { user: null, error: null });
 });
 
-app.get('/mealplan', optionalAuth, (req, res) => {
-  res.render('mealplan', { user: req.user || null, activePage: 'mealplan' });
+const MealPlan = require('./models/MealPlan');
+
+app.get('/mealplan', optionalAuth, async (req, res) => {
+  let savedPlans = [];
+  if (req.user) {
+    try {
+      savedPlans = await MealPlan.find({ savedBy: req.user._id }).sort('-createdAt').lean();
+    } catch (e) {
+      console.error('Error fetching saved meal plans:', e);
+    }
+  }
+  res.render('mealplan', { user: req.user || null, activePage: 'mealplan', savedPlans });
 });
 
 app.get('/saved', optionalAuth, (req, res) => {

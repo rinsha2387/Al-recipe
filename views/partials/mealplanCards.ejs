@@ -22,12 +22,17 @@
     <div style="padding: 0 24px 24px;">
     <% (day.meals || []).forEach(function(m) { var fs = getFoodStyle(m.dish); %>
       <div style="margin-bottom: 16px; background: var(--bg); border-radius: var(--radius-sm); overflow: hidden;">
-        <div style="background: <%- fs.gradient %>; padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 24px;"><%- fs.emoji %></span>
-          <div>
-            <p style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 0.5px;"><%- m.meal %></p>
-            <p style="font-size: 16px; font-weight: 700; color: #fff;"><%- m.dish %></p>
+        <div style="background: <%- fs.gradient %>; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;"><%- fs.emoji %></span>
+            <div>
+              <p style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,.75); text-transform: uppercase; letter-spacing: 0.5px;"><%- m.meal %></p>
+              <p style="font-size: 16px; font-weight: 700; color: #fff;"><%- m.dish %></p>
+            </div>
           </div>
+          <% if (typeof user !== 'undefined' && user) { %>
+            <button onclick='saveMealDish(<%- JSON.stringify({ title: m.dish, ingredients: m.ingredients, steps: m.steps }) %>)' style="background: rgba(255,255,255,0.22); border: none; color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; backdrop-filter: blur(4px); transition: background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.22)'">+ Save Dish</button>
+          <% } %>
         </div>
         <div style="padding: 16px;">
           <p style="font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px;">Ingredients:</p>
